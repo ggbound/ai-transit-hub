@@ -11,8 +11,8 @@
           v-model="searchQuery"
           placeholder="搜索模型名称"
           allow-clear
-          @search="loadModels"
-          @press-enter="loadModels"
+          @search="handleSearch"
+          @clear="handleSearch"
         />
       </a-col>
       <a-col :xs="24" :sm="12" :md="16" :lg="18" style="text-align: right;">
@@ -367,7 +367,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import api from '../../utils/api'
 import { Message } from '@arco-design/web-vue'
 import { IconPlus } from '@arco-design/web-vue/es/icon'
@@ -437,6 +437,21 @@ const filteredModels = computed(() => {
   )
 })
 
+// 过滤结果变化时同步分页总数，并纠正超界页码
+watch(filteredModels, (list) => {
+  pagination.value.total = list.length
+  const totalPages = Math.max(1, Math.ceil(list.length / pagination.value.pageSize))
+  if (pagination.value.current > totalPages) {
+    pagination.value.current = 1
+  }
+})
+
+// 搜索时回到第 1 页
+function handleSearch() {
+  pagination.value.current = 1
+  loadModels()
+}
+
 onMounted(() => {
   loadModels()
   loadProviders()
@@ -448,7 +463,6 @@ async function loadModels() {
     const response = await api.get('/admin/models')
     if (response.data.success) {
       models.value = response.data.data
-      pagination.value.total = response.data.data.length
     }
   } catch (error) {
     console.error(error)

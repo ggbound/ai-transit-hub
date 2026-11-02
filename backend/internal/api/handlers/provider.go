@@ -3,6 +3,7 @@ package handlers
 import (
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/your-org/ai-transit-hub/internal/logger"
@@ -301,12 +302,42 @@ func (h *ProviderHandler) ToggleProviderStatus(c *gin.Context) {
 	h.SuccessResponse(c, response, "Provider status updated successfully")
 }
 
-// GetProviderModels gets models for a provider
+// GetProviderModels gets models for a provider (支持分页与搜索)
 func (h *ProviderHandler) GetProviderModels(c *gin.Context) {
 	providerID, _ := strconv.Atoi(c.Param("id"))
 
+	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
+	perPage, _ := strconv.Atoi(c.DefaultQuery("per_page", "10"))
+	if page < 1 {
+		page = 1
+	}
+	if perPage < 1 || perPage > 100 {
+		perPage = 10
+	}
+
+	query := repository.DB.Model(&models.AiModel{}).Where("provider_id = ?", providerID)
+
+	// 搜索：模型代码 / 显示名称
+	if keyword := strings.TrimSpace(c.Query("keyword")); keyword != "" {
+		kw := "%" + keyword + "%"
+		query = query.Where("code LIKE ? OR name LIKE ?", kw, kw)
+	}
+	// 状态筛选：1 启用 / 0 禁用
+	if s := c.Query("status"); s != "" {
+		if status, err := strconv.Atoi(s); err == nil {
+			query = query.Where("status = ?", status)
+		}
+	}
+
+	var total int64
+	if err := query.Count(&total).Error; err != nil {
+		h.ErrorResponse(c, "Failed to fetch models", http.StatusInternalServerError)
+		return
+	}
+
 	var rawModels []models.AiModel
-	if err := repository.DB.Where("provider_id = ?", providerID).Preload("Provider").Find(&rawModels).Error; err != nil {
+	if err := query.Preload("Provider").Order("sort_order ASC, id ASC").
+		Offset((page - 1) * perPage).Limit(perPage).Find(&rawModels).Error; err != nil {
 		h.ErrorResponse(c, "Failed to fetch models", http.StatusInternalServerError)
 		return
 	}
@@ -361,7 +392,14 @@ func (h *ProviderHandler) GetProviderModels(c *gin.Context) {
 		modelsList = append(modelsList, modelData)
 	}
 
-	h.SuccessResponse(c, modelsList)
+	h.SuccessResponse(c, gin.H{
+		"data": modelsList,
+		"meta": gin.H{
+			"current_page": page,
+			"per_page":     perPage,
+			"total":        total,
+		},
+	})
 }
 
 // CreateProviderModel creates a model for a provider

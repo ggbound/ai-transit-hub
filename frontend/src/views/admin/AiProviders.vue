@@ -246,14 +246,34 @@
       width="950px"
       :footer="false"
     >
-      <div style="margin-bottom: 16px; text-align: right;">
+      <div style="margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; gap: 12px;">
+        <a-input-search
+          v-model="modelSearch"
+          placeholder="搜索模型代码 / 显示名称"
+          allow-clear
+          style="width: 260px;"
+          @search="handleModelSearch"
+          @press-enter="handleModelSearch"
+          @clear="handleModelSearch"
+        />
         <a-button type="primary" @click="showAddModel = true">
           <template #icon><icon-plus /></template>
           添加模型
         </a-button>
       </div>
       
-      <a-table :data="providerModels" :loading="modelsLoading" :pagination="false" :scroll="{ x: 1200 }">
+      <a-table
+        :data="providerModels"
+        :loading="modelsLoading"
+        :scroll="{ x: 1200 }"
+        :pagination="{
+          showTotal: true,
+          total: modelsPagination.total,
+          current: modelsPagination.page,
+          pageSize: modelsPagination.pageSize
+        }"
+        @page-change="handleModelsPageChange"
+      >
         <template #columns>
           <a-table-column title="模型类型" data-index="type" width="110" fixed="left">
             <template #cell="{ record }">
@@ -453,6 +473,8 @@ const providerModels = ref([])
 const loading = ref(false)
 const keysLoading = ref(false)
 const modelsLoading = ref(false)
+const modelsPagination = ref({ page: 1, pageSize: 10, total: 0 })
+const modelSearch = ref('')
 
 const searchKeyword = ref('')
 
@@ -766,21 +788,39 @@ async function toggleProviderModelStatus(model, val) {
 async function manageModels(provider) {
   currentProvider.value = provider
   showModelsModal.value = true
+  modelsPagination.value.page = 1
+  modelSearch.value = ''
   await loadProviderModels(provider.id)
 }
 
 async function loadProviderModels(providerId) {
   modelsLoading.value = true
   try {
-    const res = await api.get(`/admin/ai-providers/${providerId}/models`)
+    const params = {
+      page: modelsPagination.value.page,
+      per_page: modelsPagination.value.pageSize
+    }
+    if (modelSearch.value) params.keyword = modelSearch.value
+    const res = await api.get(`/admin/ai-providers/${providerId}/models`, { params })
     if (res.data.success) {
-      providerModels.value = res.data.data
+      providerModels.value = res.data.data.data || []
+      modelsPagination.value.total = res.data.data.meta?.total || 0
     }
   } catch (error) {
     Message.error('加载模型失败')
   } finally {
     modelsLoading.value = false
   }
+}
+
+function handleModelsPageChange(page) {
+  modelsPagination.value.page = page
+  loadProviderModels(currentProvider.value.id)
+}
+
+function handleModelSearch() {
+  modelsPagination.value.page = 1
+  loadProviderModels(currentProvider.value.id)
 }
 
 function editModel(model) {

@@ -89,12 +89,11 @@
                   <a-tag v-else color="gray">未知</a-tag>
                 </template>
               </a-table-column>
-              <a-table-column title="错误信息" width="240">
+              <a-table-column title="详情" width="110" align="center">
                 <template #cell="{ record }">
-                  <a-tooltip v-if="record.error_message" :content="record.error_message">
-                    <span class="error-text">{{ record.error_message }}</span>
-                  </a-tooltip>
-                  <span v-else>-</span>
+                  <a-button type="outline" size="small" @click="showUsageDetail(record)">
+                    查看详情
+                  </a-button>
                 </template>
               </a-table-column>
             </template>
@@ -244,7 +243,7 @@
           <span class="ua-text">{{ detailRecord.user_agent || '-' }}</span>
         </a-descriptions-item>
         <a-descriptions-item v-if="detailRecord.error_message" label="错误信息" :span="2">
-          <span class="error-text">{{ detailRecord.error_message }}</span>
+          <span class="error-detail-block">{{ detailRecord.error_message }}</span>
         </a-descriptions-item>
       </a-descriptions>
 
@@ -256,6 +255,36 @@
         <div class="detail-json-title">响应结果</div>
         <pre class="detail-json">{{ prettyJSON(detailRecord.response_result) }}</pre>
       </div>
+    </a-modal>
+
+    <!-- 使用日志详情弹窗 -->
+    <a-modal v-model:visible="usageDetailVisible" title="使用日志详情" :footer="false" width="640px">
+      <a-descriptions :column="2" size="medium" bordered v-if="usageDetail">
+        <a-descriptions-item label="用户" :span="1">{{ usageDetail.user?.name || '-' }}</a-descriptions-item>
+        <a-descriptions-item label="邮箱" :span="1">{{ usageDetail.user?.email || '-' }}</a-descriptions-item>
+        <a-descriptions-item label="时间" :span="1">{{ formatDate(usageDetail.created_at) }}</a-descriptions-item>
+        <a-descriptions-item label="状态" :span="1">
+          <a-tag :color="usageDetail.status === 1 ? 'green' : usageDetail.status === 0 ? 'red' : 'arcoblue'">
+            {{ usageDetail.status === 1 ? '成功' : usageDetail.status === 0 ? '失败' : '处理中' }}
+          </a-tag>
+        </a-descriptions-item>
+        <a-descriptions-item label="模型" :span="2">
+          <a-tag v-if="usageDetail.model && usageDetail.model.provider" color="arcoblue">
+            {{ usageDetail.model.provider.code }}/{{ usageDetail.model.code }}
+          </a-tag>
+          <span v-else>{{ usageDetail.model?.name || usageDetail.model?.code || '-' }}</span>
+        </a-descriptions-item>
+        <a-descriptions-item label="输入Token" :span="1">{{ usageDetail.prompt_tokens }}</a-descriptions-item>
+        <a-descriptions-item label="输出Token" :span="1">{{ usageDetail.completion_tokens }}</a-descriptions-item>
+        <a-descriptions-item label="总Token" :span="1">{{ usageDetail.total_tokens }}</a-descriptions-item>
+        <a-descriptions-item label="费用" :span="1">{{ formatCost(usageDetail.cost) }}</a-descriptions-item>
+        <a-descriptions-item label="请求时间" :span="1">{{ formatDate(usageDetail.request_time) || '-' }}</a-descriptions-item>
+        <a-descriptions-item label="响应时间" :span="1">{{ formatDate(usageDetail.response_time) || '-' }}</a-descriptions-item>
+        <a-descriptions-item label="耗时" :span="2">{{ usageDuration(usageDetail) }}</a-descriptions-item>
+        <a-descriptions-item v-if="usageDetail.error_message" label="错误信息" :span="2">
+          <span class="error-detail-block">{{ usageDetail.error_message }}</span>
+        </a-descriptions-item>
+      </a-descriptions>
     </a-modal>
   </div>
 </template>
@@ -282,6 +311,22 @@ const opSearch = reactive({ keyword: '', operation_type: '', operation_module: '
 // 详情弹窗
 const detailVisible = ref(false)
 const detailRecord = ref(null)
+
+// 使用日志详情弹窗
+const usageDetailVisible = ref(false)
+const usageDetail = ref(null)
+
+function showUsageDetail(record) {
+  usageDetail.value = record
+  usageDetailVisible.value = true
+}
+
+function usageDuration(record) {
+  if (!record.request_time || !record.response_time) return '-'
+  const ms = new Date(record.response_time).getTime() - new Date(record.request_time).getTime()
+  if (isNaN(ms) || ms < 0) return '-'
+  return ms < 1000 ? `${ms} ms` : `${(ms / 1000).toFixed(2)} s`
+}
 
 const moduleOptions = [
   { value: 'auth', label: '认证' },
@@ -518,6 +563,17 @@ function formatDate(date) {
   text-overflow: ellipsis;
   white-space: nowrap;
   vertical-align: bottom;
+}
+
+/* 详情弹窗内的错误信息：自动换行，超长不撑破弹窗 */
+.error-detail-block {
+  display: block;
+  color: #f53f3f;
+  font-size: 13px;
+  line-height: 1.6;
+  word-break: break-all;
+  white-space: pre-wrap;
+  max-width: 100%;
 }
 
 .action-text {

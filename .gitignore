@@ -1,0 +1,8 @@
+# 运行时产物（勿提交）
+/logs/
+/backend/logs/
+/artifacts/
+/.trae-html-share-packages/
+
+# 系统文件
+.DS_Store

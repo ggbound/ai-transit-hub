@@ -1,0 +1,29 @@
+[Unit]
+Description=AI Transit Hub Backend Service
+After=network.target network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/data/sites/aitb/backend
+ExecStart=/data/sites/aitb/backend/server -mode release
+Restart=on-failure
+RestartSec=5
+StartLimitInterval=60s
+StartLimitBurst=3
+
+# 环境变量
+EnvironmentFile=/data/sites/aitb/backend/.env
+
+# 资源限制
+NoFile=65536
+LimitNOFILE=65536
+
+# 日志配置
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=aitb-backend
+
+[Install]
+WantedBy=multi-user.target

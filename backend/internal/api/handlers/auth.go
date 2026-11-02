@@ -11,6 +11,7 @@ import (
 	"github.com/your-org/ai-transit-hub/internal/logger"
 	"github.com/your-org/ai-transit-hub/internal/models"
 	"github.com/your-org/ai-transit-hub/internal/repository"
+	"github.com/your-org/ai-transit-hub/internal/service"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -46,6 +47,11 @@ func (h *AuthHandler) Login(c *gin.Context) {
 		} else if strings.Contains(err.Error(), "Password") || strings.Contains(err.Error(), "password") {
 			friendlyMsg = "密码长度至少6位"
 		}
+		recordAuthLog(c, service.OperationLogEntry{
+			Type: "login", Module: "auth", Action: "POST /login",
+			Params: gin.H{"email": req.Email},
+			Status: "failed", ErrorMsg: friendlyMsg,
+		})
 		c.JSON(http.StatusBadRequest, gin.H{
 			"success": false,
 			"message": friendlyMsg,
@@ -58,6 +64,11 @@ func (h *AuthHandler) Login(c *gin.Context) {
 	var user models.User
 	if err := repository.DB.Preload("Roles").Where("email = ?", req.Email).First(&user).Error; err != nil {
 		logger.Debug("User not found or DB error: %v", err)
+		recordAuthLog(c, service.OperationLogEntry{
+			Type: "login", Module: "auth", Action: "POST /login",
+			Params: gin.H{"email": req.Email},
+			Status: "failed", ErrorMsg: "邮箱或密码错误",
+		})
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"success": false,
 			"message": "邮箱或密码错误，请重新输入",
@@ -71,6 +82,11 @@ func (h *AuthHandler) Login(c *gin.Context) {
 
 	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.Password)); err != nil {
 		logger.Debug("Password comparison failed: %v", err)
+		recordAuthLog(c, service.OperationLogEntry{
+			Type: "login", Module: "auth", Action: "POST /login",
+			Params: gin.H{"email": req.Email},
+			Status: "failed", ErrorMsg: "邮箱或密码错误",
+		})
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"success": false,
 			"message": "邮箱或密码错误，请重新输入",
@@ -87,6 +103,13 @@ func (h *AuthHandler) Login(c *gin.Context) {
 		return
 	}
 
+	recordAuthLog(c, service.OperationLogEntry{
+		Type: "login", Module: "auth", Action: "POST /login",
+		Params: gin.H{"email": req.Email},
+		Status: "success",
+		UserID: &user.ID, Username: user.Name,
+	})
+
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,
 		"message": "登录成功",
@@ -97,8 +120,22 @@ func (h *AuthHandler) Login(c *gin.Context) {
 	})
 }
 
+// recordAuthLog 补全认证类操作日志的公共字段并落库
+func recordAuthLog(c *gin.Context, entry service.OperationLogEntry) {
+	entry.IP = c.ClientIP()
+	entry.UserAgent = c.Request.UserAgent()
+	service.Operation.Record(entry)
+}
+
 // Logout 登出
 func (h *AuthHandler) Logout(c *gin.Context) {
+	if user, ok := middleware.GetUser(c); ok {
+		recordAuthLog(c, service.OperationLogEntry{
+			Type: "logout", Module: "auth", Action: "POST /logout",
+			Status: "success",
+			UserID: &user.ID, Username: user.Name,
+		})
+	}
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,
 		"message": "已安全退出",

@@ -4,12 +4,14 @@ import (
 	"time"
 )
 
-// OperationType model
+// OperationType model - 严格匹配数据库 operation_types 表结构
 type OperationType struct {
 	ID          uint      `gorm:"primaryKey;autoIncrement" json:"id"`
-	Name        string    `gorm:"size:100;uniqueIndex;not null" json:"name"`
-	DisplayName string    `gorm:"size:255" json:"display_name,omitempty"`
-	Description string    `gorm:"type:text" json:"description,omitempty"`
+	TypeCode    string    `gorm:"size:191;uniqueIndex;not null" json:"type_code"`
+	TypeName    string    `gorm:"size:191;not null" json:"type_name"`
+	Description *string   `gorm:"type:text" json:"description,omitempty"`
+	ModuleName  string    `gorm:"size:191;not null" json:"module_name"`
+	IsSensitive bool      `gorm:"default:false" json:"is_sensitive"`
 	CreatedAt   time.Time `json:"created_at"`
 	UpdatedAt   time.Time `json:"updated_at"`
 }

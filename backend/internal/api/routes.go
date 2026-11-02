@@ -137,6 +137,7 @@ func SetupRoutes(r *gin.Engine, cfg *config.Config) {
 		// Admin routes
 		admin := api.Group("/admin")
 		admin.Use(middleware.RoleMiddleware("admin"))
+		admin.Use(middleware.OperationLogMiddleware())
 		{
 			// Dashboard stats
 			admin.GET("/dashboard/stats", dashboardHandler.Stats)

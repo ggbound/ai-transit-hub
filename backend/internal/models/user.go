@@ -22,7 +22,6 @@ type User struct {
 	ApiKeys        []UserApiKey    `json:"api_keys,omitempty"`
 	ChatSessions   []ChatSession   `json:"chat_sessions,omitempty"`
 	UsageLogs      []UsageLog      `json:"usage_logs,omitempty"`
-	OperationLogs  []OperationLog  `json:"operation_logs,omitempty"`
 	UserUsageStats []UserUsageStat `json:"user_usage_stats,omitempty"`
 }
 

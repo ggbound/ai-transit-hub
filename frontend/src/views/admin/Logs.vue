@@ -57,7 +57,9 @@
             <template #columns>
               <a-table-column title="用户" width="200" fixed="left">
                 <template #cell="{ record }">
-                  {{ record.user?.name }} ({{ record.user?.email }})
+                  <a-tooltip :content="`${record.user?.name || '-'} (${record.user?.email || '-'})`">
+                    <span class="cell-ellipsis">{{ record.user?.name }} ({{ record.user?.email }})</span>
+                  </a-tooltip>
                 </template>
               </a-table-column>
               <a-table-column title="时间" data-index="created_at" width="180">
@@ -65,17 +67,30 @@
                   {{ formatDate(record.created_at) }}
                 </template>
               </a-table-column>
-              <a-table-column title="模型" width="220">
+              <a-table-column title="模型" width="210">
                 <template #cell="{ record }">
-                  <a-tag v-if="record.model && record.model.provider" color="arcoblue">
-                    {{ record.model.provider.code }}/{{ record.model.code }}
-                  </a-tag>
-                  <span v-else>{{ record.model?.name || record.model?.code || '-' }}</span>
+                  <div v-if="record.model && record.model.provider" class="model-cell">
+                    <div class="model-name">{{ record.model.name || record.model.code }}</div>
+                    <div class="model-sub">{{ record.model.provider.code }} · {{ record.model.code }}</div>
+                  </div>
+                  <span v-else class="cell-ellipsis">{{ record.model?.name || record.model?.code || '-' }}</span>
                 </template>
               </a-table-column>
-              <a-table-column title="输入Token" data-index="prompt_tokens" width="110" />
-              <a-table-column title="输出Token" data-index="completion_tokens" width="110" />
-              <a-table-column title="总Token" data-index="total_tokens" width="110" />
+              <a-table-column title="输入Token" width="110" align="right">
+                <template #cell="{ record }">
+                  {{ formatTokens(record.prompt_tokens) }}
+                </template>
+              </a-table-column>
+              <a-table-column title="输出Token" width="110" align="right">
+                <template #cell="{ record }">
+                  {{ formatTokens(record.completion_tokens) }}
+                </template>
+              </a-table-column>
+              <a-table-column title="总Token" width="120" align="right">
+                <template #cell="{ record }">
+                  <span class="token-total">{{ formatTokens(record.total_tokens) }}</span>
+                </template>
+              </a-table-column>
               <a-table-column title="费用" width="110">
                 <template #cell="{ record }">
                   {{ formatCost(record.cost) }}
@@ -89,7 +104,7 @@
                   <a-tag v-else color="gray">未知</a-tag>
                 </template>
               </a-table-column>
-              <a-table-column title="详情" width="110" align="center">
+              <a-table-column title="详情" width="110" align="center" fixed="right">
                 <template #cell="{ record }">
                   <a-button type="outline" size="small" @click="showUsageDetail(record)">
                     查看详情
@@ -159,14 +174,16 @@
               current: operationPagination.page,
               pageSize: operationPagination.pageSize
             }"
-            :scroll="{ x: 1400 }"
+            :scroll="{ x: 1150 }"
             @page-change="handleOperationPageChange"
             @page-size-change="handleOperationPageSizeChange"
           >
             <template #columns>
               <a-table-column title="操作人" width="180" fixed="left">
                 <template #cell="{ record }">
-                  {{ record.username || record.user?.name || '-' }}
+                  <a-tooltip :content="record.username || record.user?.name || '-'">
+                    <span class="cell-ellipsis">{{ record.username || record.user?.name || '-' }}</span>
+                  </a-tooltip>
                 </template>
               </a-table-column>
               <a-table-column title="时间" data-index="created_at" width="180">
@@ -197,14 +214,6 @@
                   <a-tag :color="record.status === 'success' ? 'green' : 'red'">
                     {{ record.status === 'success' ? '成功' : '失败' }}
                   </a-tag>
-                </template>
-              </a-table-column>
-              <a-table-column title="错误信息" width="200">
-                <template #cell="{ record }">
-                  <a-tooltip v-if="record.error_message" :content="record.error_message">
-                    <span class="error-text">{{ record.error_message }}</span>
-                  </a-tooltip>
-                  <span v-else>-</span>
                 </template>
               </a-table-column>
               <a-table-column title="操作" width="90" fixed="right">
@@ -269,14 +278,17 @@
           </a-tag>
         </a-descriptions-item>
         <a-descriptions-item label="模型" :span="2">
-          <a-tag v-if="usageDetail.model && usageDetail.model.provider" color="arcoblue">
-            {{ usageDetail.model.provider.code }}/{{ usageDetail.model.code }}
-          </a-tag>
+          <div v-if="usageDetail.model && usageDetail.model.provider" class="model-cell">
+            <div class="model-name">{{ usageDetail.model.name || usageDetail.model.code }}</div>
+            <div class="model-sub">{{ usageDetail.model.provider.code }} · {{ usageDetail.model.code }}</div>
+          </div>
           <span v-else>{{ usageDetail.model?.name || usageDetail.model?.code || '-' }}</span>
         </a-descriptions-item>
-        <a-descriptions-item label="输入Token" :span="1">{{ usageDetail.prompt_tokens }}</a-descriptions-item>
-        <a-descriptions-item label="输出Token" :span="1">{{ usageDetail.completion_tokens }}</a-descriptions-item>
-        <a-descriptions-item label="总Token" :span="1">{{ usageDetail.total_tokens }}</a-descriptions-item>
+        <a-descriptions-item label="输入Token" :span="1">{{ formatTokens(usageDetail.prompt_tokens) }}</a-descriptions-item>
+        <a-descriptions-item label="输出Token" :span="1">{{ formatTokens(usageDetail.completion_tokens) }}</a-descriptions-item>
+        <a-descriptions-item label="总Token" :span="1">
+          <span class="token-total">{{ formatTokens(usageDetail.total_tokens) }}</span>
+        </a-descriptions-item>
         <a-descriptions-item label="费用" :span="1">{{ formatCost(usageDetail.cost) }}</a-descriptions-item>
         <a-descriptions-item label="请求时间" :span="1">{{ formatDate(usageDetail.request_time) || '-' }}</a-descriptions-item>
         <a-descriptions-item label="响应时间" :span="1">{{ formatDate(usageDetail.response_time) || '-' }}</a-descriptions-item>
@@ -378,6 +390,11 @@ function prettyJSON(value) {
 function formatCost(cost) {
   if (cost === null || cost === undefined) return '-'
   return Number(cost).toFixed(6).replace(/0+$/, '').replace(/\.$/, '') || '0'
+}
+
+// Token 千分位格式化
+function formatTokens(n) {
+  return Number(n || 0).toLocaleString('en-US')
 }
 
 onMounted(() => {
@@ -555,14 +572,47 @@ function formatDate(date) {
   gap: 8px;
 }
 
-.error-text {
-  color: #f53f3f;
+/* 表格单元格禁止换行 */
+.logs-container :deep(.arco-table-th),
+.logs-container :deep(.arco-table-td) {
+  white-space: nowrap;
+}
+
+/* 单元格长文本：单行省略 */
+.cell-ellipsis {
   display: inline-block;
   max-width: 100%;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
   vertical-align: bottom;
+}
+
+/* 使用日志模型单元格：名称 + 供应商代码双行 */
+.model-cell {
+  min-width: 0;
+}
+
+.model-name {
+  font-weight: 500;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.model-sub {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 总Token 加粗 */
+.token-total {
+  font-weight: 500;
 }
 
 /* 详情弹窗内的错误信息：自动换行，超长不撑破弹窗 */

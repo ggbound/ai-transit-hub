@@ -59,25 +59,45 @@
 
     <!-- 模型费率配置 -->
     <a-card title="模型费率配置" class="content-card" style="margin-bottom: 16px;">
-      <a-table :data="modelRatesData" :loading="loading">
+      <div class="table-toolbar">
+        <span class="toolbar-info">共 {{ filteredRates.length }} 个模型</span>
+        <a-input-search
+          v-model="rateKeyword"
+          placeholder="搜索模型名称 / 代码 / 提供商"
+          allow-clear
+          style="width: 280px;"
+        />
+      </div>
+      <a-table
+        :data="pagedRates"
+        :loading="loading"
+        :scroll="{ x: 760 }"
+        :pagination="ratePagination"
+        @page-change="(p) => ratePage = p"
+      >
         <template #columns>
-          <a-table-column title="模型名称" data-index="model_name" />
-          <a-table-column title="提供商" data-index="provider" />
-          <a-table-column title="模型代码" data-index="code" />
-          <a-table-column title="输入价格" width="180">
+          <a-table-column title="模型" fixed="left" :width="240">
             <template #cell="{ record }">
-              ¥{{ record.input_price.toFixed(4) }} / 百万tokens
+              <div class="rate-model-cell">
+                <div class="rate-model-name">{{ record.model_name }}</div>
+                <div class="rate-model-code">{{ record.provider }} · {{ record.code }}</div>
+              </div>
             </template>
           </a-table-column>
-          <a-table-column title="输出价格" width="180">
+          <a-table-column title="输入价格" :width="180" align="right">
             <template #cell="{ record }">
-              ¥{{ record.output_price.toFixed(4) }} / 百万tokens
+              <span class="price-text">¥{{ record.input_price.toFixed(4) }} <em>/ 百万tokens</em></span>
             </template>
           </a-table-column>
-          <a-table-column title="操作" width="100">
+          <a-table-column title="输出价格" :width="180" align="right">
+            <template #cell="{ record }">
+              <span class="price-text">¥{{ record.output_price.toFixed(4) }} <em>/ 百万tokens</em></span>
+            </template>
+          </a-table-column>
+          <a-table-column title="操作" fixed="right" :width="100" align="center">
             <template #cell="{ record }">
               <a-button type="text" size="small" @click="editRate(record)">
-                <icon-edit />
+                <template #icon><icon-edit /></template>
                 编辑
               </a-button>
             </template>
@@ -88,26 +108,35 @@
 
     <!-- 费用明细 -->
     <a-card title="费用明细" class="content-card">
-      <a-table 
-        :data="billingRecordsData" 
+      <a-table
+        :data="billingRecordsData"
         :loading="recordsLoading"
-        :pagination="pagination"
+        :scroll="{ x: 1000 }"
+        :pagination="{ ...pagination, showTotal: true }"
         @page-change="handlePageChange"
       >
         <template #columns>
-          <a-table-column title="时间" data-index="created_at" width="160" />
-          <a-table-column title="用户" data-index="user" width="120" />
-          <a-table-column title="模型" data-index="model" width="150" />
-          <a-table-column title="输入Token" data-index="input_tokens" width="120" />
-          <a-table-column title="输出Token" data-index="output_tokens" width="120" />
-          <a-table-column title="总Token" width="120">
+          <a-table-column title="时间" data-index="created_at" :width="170" fixed="left" />
+          <a-table-column title="用户" data-index="user" :width="140" ellipsis tooltip />
+          <a-table-column title="模型" data-index="model" :width="200" ellipsis tooltip />
+          <a-table-column title="输入Token" :width="120" align="right">
             <template #cell="{ record }">
-              {{ record.input_tokens + record.output_tokens }}
+              {{ formatTokens(record.input_tokens) }}
             </template>
           </a-table-column>
-          <a-table-column title="费用" width="120">
+          <a-table-column title="输出Token" :width="120" align="right">
             <template #cell="{ record }">
-              <span style="color: #f53f3f;">¥{{ record.cost.toFixed(6) }}</span>
+              {{ formatTokens(record.output_tokens) }}
+            </template>
+          </a-table-column>
+          <a-table-column title="总Token" :width="130" align="right">
+            <template #cell="{ record }">
+              <span class="token-total">{{ formatTokens(record.input_tokens + record.output_tokens) }}</span>
+            </template>
+          </a-table-column>
+          <a-table-column title="费用" :width="140" align="right" fixed="right">
+            <template #cell="{ record }">
+              <span class="cost-text">¥{{ record.cost.toFixed(6) }}</span>
             </template>
           </a-table-column>
         </template>
@@ -149,7 +178,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed, watch } from 'vue'
 import { Message } from '@arco-design/web-vue'
 import { IconEdit } from '@arco-design/web-vue/es/icon'
 import api from '../../utils/api'
@@ -168,6 +197,29 @@ const stats = ref({
 // 模型费率
 const modelRates = ref([])
 const modelRatesData = computed(() => Array.isArray(modelRates.value) ? modelRates.value : [])
+
+// 费率搜索 + 本地分页
+const rateKeyword = ref('')
+const ratePage = ref(1)
+const RATE_PAGE_SIZE = 10
+const filteredRates = computed(() => {
+  const kw = rateKeyword.value.trim().toLowerCase()
+  if (!kw) return modelRatesData.value
+  return modelRatesData.value.filter((r) =>
+    [r.model_name, r.code, r.provider].some((v) => String(v || '').toLowerCase().includes(kw))
+  )
+})
+const pagedRates = computed(() => {
+  const start = (ratePage.value - 1) * RATE_PAGE_SIZE
+  return filteredRates.value.slice(start, start + RATE_PAGE_SIZE)
+})
+const ratePagination = computed(() => ({
+  current: ratePage.value,
+  pageSize: RATE_PAGE_SIZE,
+  total: filteredRates.value.length,
+  showTotal: true,
+}))
+watch(rateKeyword, () => { ratePage.value = 1 })
 
 // 费用明细
 const billingRecords = ref([])
@@ -282,6 +334,11 @@ function handlePageChange(page) {
   pagination.value.current = page
   loadRecords()
 }
+
+// Token 千分位格式化
+function formatTokens(n) {
+  return Number(n || 0).toLocaleString('en-US')
+}
 </script>
 
 <style scoped>
@@ -310,5 +367,64 @@ function handlePageChange(page) {
   border-radius: 8px;
   box-shadow: var(--shadow-sm);
   border: 1px solid var(--border-color);
+}
+
+/* 表格工具栏 */
+.table-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.toolbar-info {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+/* 所有单元格不换行 */
+.billing-container :deep(.arco-table-th),
+.billing-container :deep(.arco-table-td) {
+  white-space: nowrap;
+}
+
+/* 费率表模型单元格：名称 + 代码双行 */
+.rate-model-cell {
+  min-width: 0;
+}
+
+.rate-model-name {
+  font-weight: 500;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rate-model-code {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 价格文本：单位弱化 */
+.price-text em {
+  font-style: normal;
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+/* 总Token 加粗 */
+.token-total {
+  font-weight: 500;
+}
+
+/* 费用金额 */
+.cost-text {
+  color: #f53f3f;
+  font-weight: 500;
 }
 </style>

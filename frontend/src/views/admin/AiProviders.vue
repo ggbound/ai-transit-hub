@@ -263,9 +263,10 @@
       </div>
       
       <a-table
+        class="models-table"
         :data="providerModels"
         :loading="modelsLoading"
-        :scroll="{ x: 1200 }"
+        :scroll="{ x: 1460 }"
         :pagination="{
           showTotal: true,
           total: modelsPagination.total,
@@ -280,19 +281,31 @@
               <a-tag :color="getModelTypeColor(record.type)">{{ getModelTypeName(record.type) }}</a-tag>
             </template>
           </a-table-column>
-          <a-table-column title="模型代码" data-index="code" width="180">
+          <a-table-column title="模型代码" data-index="code" width="220">
             <template #cell="{ record }">
-              <a-tag color="arcoblue">{{ record.code }}</a-tag>
+              <a-tooltip :content="record.code">
+                <a-tag color="arcoblue" class="code-tag">{{ record.code }}</a-tag>
+              </a-tooltip>
             </template>
           </a-table-column>
-          <a-table-column title="显示名称" data-index="name" width="200" />
-          <a-table-column title="最大Tokens" data-index="max_tokens" width="110" align="center" />
-          <a-table-column title="输入价格" width="150" align="center">
+          <a-table-column title="显示名称" data-index="name" width="200">
+            <template #cell="{ record }">
+              <a-tooltip :content="record.name">
+                <span class="cell-ellipsis">{{ record.name || '-' }}</span>
+              </a-tooltip>
+            </template>
+          </a-table-column>
+          <a-table-column title="最大Tokens" data-index="max_tokens" width="120" align="right">
+            <template #cell="{ record }">
+              {{ Number(record.max_tokens || 0).toLocaleString('en-US') }}
+            </template>
+          </a-table-column>
+          <a-table-column title="输入价格" width="175" align="right">
             <template #cell="{ record }">
               <span>¥{{ Number(record.input_price || 0).toFixed(4) }} / 百万tokens</span>
             </template>
           </a-table-column>
-          <a-table-column title="输出价格" width="150" align="center">
+          <a-table-column title="输出价格" width="175" align="right">
             <template #cell="{ record }">
               <span>¥{{ Number(record.output_price || 0).toFixed(4) }} / 百万tokens</span>
             </template>
@@ -308,17 +321,17 @@
               />
             </template>
           </a-table-column>
-          <a-table-column title="Responses API" data-index="supports_response" width="120" align="center">
+          <a-table-column title="Responses API" data-index="supports_response" width="140" align="center">
             <template #cell="{ record }">
               <a-tag :color="record.supports_response ? 'cyan' : 'default'">{{ record.supports_response ? '已启用' : '未启用' }}</a-tag>
             </template>
           </a-table-column>
-          <a-table-column title="Messages API" data-index="supports_messages" width="120" align="center">
+          <a-table-column title="Messages API" data-index="supports_messages" width="140" align="center">
             <template #cell="{ record }">
               <a-tag :color="record.supports_messages ? 'purple' : 'default'">{{ record.supports_messages ? '已启用' : '未启用' }}</a-tag>
             </template>
           </a-table-column>
-          <a-table-column title="操作" width="80" align="center" fixed="right">
+          <a-table-column title="操作" width="90" align="center" fixed="right">
             <template #cell="{ record }">
               <a-button type="text" size="small" @click="editModel(record)">编辑</a-button>
             </template>
@@ -986,5 +999,31 @@ async function deleteModel(model) {
   border-radius: 8px;
   box-shadow: var(--shadow-sm);
   border: 1px solid var(--border-color);
+}
+
+/* 模型列表：单元格禁止换行 */
+.models-table :deep(.arco-table-th),
+.models-table :deep(.arco-table-td) {
+  white-space: nowrap;
+}
+
+/* 模型代码标签：超长省略 */
+.code-tag {
+  display: inline-block;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  vertical-align: bottom;
+}
+
+/* 单元格长文本：单行省略 */
+.cell-ellipsis {
+  display: inline-block;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  vertical-align: bottom;
 }
 </style>

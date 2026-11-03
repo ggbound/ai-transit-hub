@@ -96,10 +96,10 @@
           <template #title>
             <span>系统管理</span>
           </template>
-          <!-- <a-menu-item key="/admin/billing">
+          <a-menu-item key="/admin/billing">
             <template #icon><icon-file /></template>
             <span>计费管理</span>
-          </a-menu-item> -->
+          </a-menu-item>
           <a-menu-item key="/admin/logs">
             <template #icon><icon-history /></template>
             <span>日志审计</span>

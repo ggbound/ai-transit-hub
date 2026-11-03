@@ -102,6 +102,8 @@ func (h *ModelController) Index(c *gin.Context) {
 			"description":         m.Description,
 			"type":                m.Type,
 			"max_tokens":          m.MaxTokens,
+			"input_price":         m.InputPrice,
+			"output_price":        m.OutputPrice,
 			"capabilities":        json.RawMessage(m.Capabilities),
 			"supports_response":   getBoolOrDefault(m.SupportsResponse, false),
 			"supports_messages":   getBoolOrDefault(m.SupportsMessages, false),

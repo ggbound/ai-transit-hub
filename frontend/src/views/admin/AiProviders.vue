@@ -287,6 +287,16 @@
           </a-table-column>
           <a-table-column title="显示名称" data-index="name" width="200" />
           <a-table-column title="最大Tokens" data-index="max_tokens" width="110" align="center" />
+          <a-table-column title="输入价格" width="150" align="center">
+            <template #cell="{ record }">
+              <span>¥{{ Number(record.input_price || 0).toFixed(4) }} / 百万tokens</span>
+            </template>
+          </a-table-column>
+          <a-table-column title="输出价格" width="150" align="center">
+            <template #cell="{ record }">
+              <span>¥{{ Number(record.output_price || 0).toFixed(4) }} / 百万tokens</span>
+            </template>
+          </a-table-column>
           <a-table-column title="状态" data-index="status" width="90" align="center">
             <template #cell="{ record }">
               <a-switch
@@ -365,6 +375,12 @@
           <a-col :span="12">
             <a-form-item label="最大Tokens">
               <a-input-number v-model="modelForm.max_tokens" :min="1" style="width: 100%;" />
+            </a-form-item>
+            <a-form-item label="输入价格(¥/百万tokens)">
+              <a-input-number v-model="modelForm.input_price" :min="0" :precision="4" :step="0.1" placeholder="0.0000" style="width: 100%;" />
+            </a-form-item>
+            <a-form-item label="输出价格(¥/百万tokens)">
+              <a-input-number v-model="modelForm.output_price" :min="0" :precision="4" :step="0.1" placeholder="0.0000" style="width: 100%;" />
             </a-form-item>
           </a-col>
         </a-row>
@@ -530,6 +546,8 @@ const modelForm = ref({
   name: '',
   description: '',
   max_tokens: 4096,
+  input_price: 0,
+  output_price: 0,
   capabilities: ['chat'],
   is_public: true,
   status: true,
@@ -831,6 +849,8 @@ function editModel(model) {
     name: model.name,
     description: model.description || '',
     max_tokens: model.max_tokens || 4096,
+    input_price: Number(model.input_price || 0),
+    output_price: Number(model.output_price || 0),
     capabilities: model.capabilities || ['chat'],
     is_public: model.is_public,
     status: model.status,
@@ -890,6 +910,8 @@ function resetModelForm() {
     name: '',
     description: '',
     max_tokens: 4096,
+    input_price: 0,
+    output_price: 0,
     capabilities: ['chat'],
     is_public: true,
     status: true,

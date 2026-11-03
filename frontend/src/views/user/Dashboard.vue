@@ -184,6 +184,10 @@
                       <a-tag v-if="model.supports_videos" color="red" size="small">视频</a-tag>
                       <a-tag v-if="model.supports_audio" color="pink" size="small">音频</a-tag>
                     </div>
+                    <div v-if="Number(model.input_price || 0) > 0 || Number(model.output_price || 0) > 0" class="model-tags model-price">
+                      <icon-fire size="12" />
+                      <span>输入 ¥{{ Number(model.input_price || 0).toFixed(4) }} · 输出 ¥{{ Number(model.output_price || 0).toFixed(4) }}（¥/百万tokens）</span>
+                    </div>
                   </div>
                 </a-card>
               </a-grid-item>
@@ -519,6 +523,13 @@ onMounted(async () => {
   display: flex;
   align-items: center;
   gap: 4px;
+  margin-top: 8px;
+  color: #f77234;
+  font-size: 12px;
+}
+.model-price span {
+  font-size: 12px;
+  word-break: break-all;
 }
 
 .quick-item {

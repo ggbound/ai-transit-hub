@@ -53,6 +53,16 @@
         </a-table-column>
         <a-table-column title="显示名称" data-index="name" width="150" />
         <a-table-column title="最大Tokens" data-index="max_tokens" width="100" />
+        <a-table-column title="输入价格" width="150">
+          <template #cell="{ record }">
+            <span>¥{{ Number(record.input_price || 0).toFixed(4) }} / 百万tokens</span>
+          </template>
+        </a-table-column>
+        <a-table-column title="输出价格" width="150">
+          <template #cell="{ record }">
+            <span>¥{{ Number(record.output_price || 0).toFixed(4) }} / 百万tokens</span>
+          </template>
+        </a-table-column>
         <a-table-column title="状态" data-index="status" width="80">
           <template #cell="{ record }">
             <a-switch
@@ -134,7 +144,13 @@
         <a-row :gutter="16">
           <a-col :span="12">
             <a-form-item label="最大Tokens" field="max_tokens">
-              <a-input-number v-model="createForm.max_tokens" :min="1" style="width: 100%" />
+              <a-input-number v-model="createForm.max_tokens" :min="1" style="width: 100%;" />
+            </a-form-item>
+            <a-form-item label="输入价格(¥/百万tokens)" field="input_price">
+              <a-input-number v-model="createForm.input_price" :min="0" :precision="4" :step="0.1" placeholder="0.0000" style="width: 100%;" />
+            </a-form-item>
+            <a-form-item label="输出价格(¥/百万tokens)" field="output_price">
+              <a-input-number v-model="createForm.output_price" :min="0" :precision="4" :step="0.1" placeholder="0.0000" style="width: 100%;" />
             </a-form-item>
           </a-col>
         </a-row>
@@ -263,7 +279,13 @@
         <a-row :gutter="16">
           <a-col :span="12">
             <a-form-item label="最大Tokens" field="max_tokens">
-              <a-input-number v-model="editForm.max_tokens" :min="1" style="width: 100%" />
+              <a-input-number v-model="editForm.max_tokens" :min="1" style="width: 100%;" />
+            </a-form-item>
+            <a-form-item label="输入价格(¥/百万tokens)" field="input_price">
+              <a-input-number v-model="editForm.input_price" :min="0" :precision="4" :step="0.1" placeholder="0.0000" style="width: 100%;" />
+            </a-form-item>
+            <a-form-item label="输出价格(¥/百万tokens)" field="output_price">
+              <a-input-number v-model="editForm.output_price" :min="0" :precision="4" :step="0.1" placeholder="0.0000" style="width: 100%;" />
             </a-form-item>
           </a-col>
         </a-row>
@@ -391,6 +413,8 @@ const createForm = ref({
   name: '',
   description: '',
   max_tokens: 4096,
+  input_price: 0,
+  output_price: 0,
   capabilities: ['chat'],
   is_public: true,
   status: true,
@@ -411,6 +435,8 @@ const editForm = ref({
   name: '',
   description: '',
   max_tokens: 4096,
+  input_price: 0,
+  output_price: 0,
   capabilities: ['chat'],
   is_public: true,
   status: true,

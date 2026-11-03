@@ -610,6 +610,7 @@ func ExtractIntFromMap(m map[string]interface{}, keys ...string) int {
 	return 0
 }
 
+// CalculateCost 计算费用（¥）：价格按百万 tokens 单价（¥/1M tokens）配置
 func CalculateCost(promptTokens, completionTokens int, model *models.AiModel) float64 {
 	inputPrice := 0.0
 	outputPrice := 0.0
@@ -621,7 +622,7 @@ func CalculateCost(promptTokens, completionTokens int, model *models.AiModel) fl
 		outputPrice = float64(model.OutputPrice)
 	}
 
-	cost := (float64(promptTokens) * inputPrice / 1000) + (float64(completionTokens) * outputPrice / 1000)
+	cost := (float64(promptTokens) * inputPrice / 1_000_000) + (float64(completionTokens) * outputPrice / 1_000_000)
 	return cost
 }
 

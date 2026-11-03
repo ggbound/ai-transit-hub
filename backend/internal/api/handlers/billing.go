@@ -67,7 +67,7 @@ func (h *BillingHandler) Rates(c *gin.Context) {
 	h.SuccessResponse(c, rates)
 }
 
-// UpdateRate 更新指定模型的费率（input_price/output_price，¥/1K tokens）
+// UpdateRate 更新指定模型的费率（input_price/output_price，¥/百万 tokens）
 func (h *BillingHandler) UpdateRate(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil || id <= 0 {

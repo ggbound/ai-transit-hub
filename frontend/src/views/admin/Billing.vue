@@ -66,12 +66,12 @@
           <a-table-column title="模型代码" data-index="code" />
           <a-table-column title="输入价格" width="180">
             <template #cell="{ record }">
-              ¥{{ record.input_price.toFixed(6) }} / 1K tokens
+              ¥{{ record.input_price.toFixed(4) }} / 百万tokens
             </template>
           </a-table-column>
           <a-table-column title="输出价格" width="180">
             <template #cell="{ record }">
-              ¥{{ record.output_price.toFixed(6) }} / 1K tokens
+              ¥{{ record.output_price.toFixed(4) }} / 百万tokens
             </template>
           </a-table-column>
           <a-table-column title="操作" width="100">
@@ -125,19 +125,21 @@
         <a-form-item label="模型名称">
           <span>{{ editForm.model_name }}</span>
         </a-form-item>
-        <a-form-item label="输入价格 (¥/1K tokens)">
-          <a-input-number 
-            v-model="editForm.input_price" 
-            :min="0" 
-            :precision="6" 
+        <a-form-item label="输入价格 (¥/百万tokens)">
+          <a-input-number
+            v-model="editForm.input_price"
+            :min="0"
+            :precision="4"
+            :step="0.1"
             style="width: 100%;"
           />
         </a-form-item>
-        <a-form-item label="输出价格 (¥/1K tokens)">
-          <a-input-number 
-            v-model="editForm.output_price" 
-            :min="0" 
-            :precision="6" 
+        <a-form-item label="输出价格 (¥/百万tokens)">
+          <a-input-number
+            v-model="editForm.output_price"
+            :min="0"
+            :precision="4"
+            :step="0.1"
             style="width: 100%;"
           />
         </a-form-item>

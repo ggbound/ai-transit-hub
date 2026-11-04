@@ -51,13 +51,14 @@
       </a-table>
     </a-card>
 
-    <!-- 创建工具弹窗 -->
-    <a-modal
+    <!-- 创建工具抽屉 -->
+    <a-drawer
       v-model:visible="showCreateModal"
       title="新建工具"
       @ok="createTool"
-      :confirmLoading="createLoading"
-      width="600px"
+      :ok-loading="createLoading"
+      :width="600"
+      unmount-on-close
     >
       <a-form :model="createForm" layout="vertical">
         <a-form-item label="工具名称" field="name">
@@ -86,15 +87,16 @@
           <a-switch v-model="createForm.enabled" />
         </a-form-item>
       </a-form>
-    </a-modal>
+    </a-drawer>
 
-    <!-- 编辑工具弹窗 -->
-    <a-modal
+    <!-- 编辑工具抽屉 -->
+    <a-drawer
       v-model:visible="showEditModalVisible"
       title="编辑工具"
       @ok="updateTool"
-      :confirmLoading="updateLoading"
-      width="600px"
+      :ok-loading="updateLoading"
+      :width="600"
+      unmount-on-close
     >
       <a-form :model="editForm" layout="vertical">
         <a-form-item label="工具名称" field="name">
@@ -123,7 +125,7 @@
           <a-switch v-model="editForm.enabled" />
         </a-form-item>
       </a-form>
-    </a-modal>
+    </a-drawer>
   </div>
 </template>
 

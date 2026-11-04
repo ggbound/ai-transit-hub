@@ -111,13 +111,14 @@
     </a-table>
   </a-card>
 
-    <!-- 创建模型弹窗 -->
-    <a-modal
+    <!-- 创建模型抽屉 -->
+    <a-drawer
       v-model:visible="showCreateModal"
       title="新建模型"
       @ok="createModel"
-      :confirm-loading="createLoading"
-      width="600px"
+      :ok-loading="createLoading"
+      :width="600"
+      unmount-on-close
     >
       <a-form :model="createForm" layout="vertical">
         <a-form-item label="提供商" field="provider_id" required>
@@ -235,7 +236,7 @@
           <a-switch v-model="createForm.supports_messages" />
         </a-form-item>
         <a-form-item label="Messages API 端点" v-if="createForm.supports_messages">
-          <a-input 
+          <a-input
             v-model="createForm.messages_endpoint"
             placeholder="https://api.anthropic.com/v1/messages"
           />
@@ -244,15 +245,16 @@
           </div>
         </a-form-item>
       </a-form>
-    </a-modal>
+    </a-drawer>
 
-    <!-- 编辑模型弹窗 -->
-    <a-modal
+    <!-- 编辑模型抽屉 -->
+    <a-drawer
       v-model:visible="showEditModalVisible"
       title="编辑模型"
       @ok="updateModel"
-      :confirm-loading="updateLoading"
-      width="600px"
+      :ok-loading="updateLoading"
+      :width="600"
+      unmount-on-close
     >
       <a-form :model="editForm" layout="vertical">
         <a-form-item label="提供商" field="provider_id" required>
@@ -398,7 +400,7 @@
           </a-collapse-panel>
         </a-collapse>
       </a-form>
-    </a-modal>
+    </a-drawer>
   </div>
 </template>
 

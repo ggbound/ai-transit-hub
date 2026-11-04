@@ -67,12 +67,14 @@
       </a-table>
     </a-card>
 
-    <!-- 创建用户弹窗 -->
-    <a-modal
+    <!-- 创建用户抽屉 -->
+    <a-drawer
       v-model:visible="showCreateModal"
       title="新建用户"
+      :width="480"
+      unmount-on-close
       @ok="createUser"
-      :confirmLoading="createLoading"
+      :ok-loading="createLoading"
     >
       <a-form :model="createForm" layout="vertical">
         <a-form-item label="姓名" field="name">
@@ -92,7 +94,7 @@
           </a-select>
         </a-form-item>
         <a-form-item label="状态" field="status">
-          <a-switch 
+          <a-switch
             :model-value="!!createForm.status"
             :active-value="1"
             :inactive-value="0"
@@ -100,14 +102,16 @@
           />
         </a-form-item>
       </a-form>
-    </a-modal>
+    </a-drawer>
 
-    <!-- 编辑用户弹窗 -->
-    <a-modal
+    <!-- 编辑用户抽屉 -->
+    <a-drawer
       v-model:visible="showEditModalVisible"
       title="编辑用户"
+      :width="480"
+      unmount-on-close
       @ok="updateUser"
-      :confirmLoading="updateLoading"
+      :ok-loading="updateLoading"
     >
       <a-form :model="editForm" layout="vertical">
         <a-form-item label="姓名" field="name">
@@ -127,7 +131,7 @@
           </a-select>
         </a-form-item>
         <a-form-item label="状态" field="status">
-          <a-switch 
+          <a-switch
             :model-value="!!editForm.status"
             :active-value="1"
             :inactive-value="0"
@@ -135,7 +139,7 @@
           />
         </a-form-item>
       </a-form>
-    </a-modal>
+    </a-drawer>
   </div>
 </template>
 

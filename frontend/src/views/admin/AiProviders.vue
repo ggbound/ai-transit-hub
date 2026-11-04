@@ -90,11 +90,12 @@
       </a-table>
     </a-card>
 
-    <!-- 添加/编辑提供商弹窗 -->
-    <a-modal
+    <!-- 添加/编辑提供商抽屉 -->
+    <a-drawer
       v-model:visible="showAddModal"
       :title="editingProvider ? '编辑提供商' : '添加提供商'"
-      width="650px"
+      :width="650"
+      unmount-on-close
       @ok="handleSubmit"
       @cancel="resetForm"
     >
@@ -173,16 +174,15 @@
           />
         </a-form-item>
       </a-form>
-    </a-modal>
-    
+    </a-drawer>
 
-    
-    <!-- 密钥管理弹窗 -->
-    <a-modal
+    <!-- 密钥管理抽屉 -->
+    <a-drawer
       v-model:visible="showKeysModal"
       :title="currentProvider?.name + ' - API密钥管理'"
-      width="850px"
+      :width="850"
       :footer="false"
+      unmount-on-close
     >
       <div style="margin-bottom: 16px; text-align: right;">
         <a-button type="primary" @click="showAddKey = true">
@@ -213,12 +213,14 @@
           </a-table-column>
         </template>
       </a-table>
-    </a-modal>
-    
+    </a-drawer>
+
     <!-- 添加/编辑密钥 -->
-    <a-modal
+    <a-drawer
       v-model:visible="showAddKey"
       :title="editingKey ? '编辑密钥' : '添加密钥'"
+      :width="520"
+      unmount-on-close
       @ok="handleKeySubmit"
       @cancel="resetKeyForm"
     >
@@ -237,14 +239,15 @@
           <a-switch v-model="keyForm.status" />
         </a-form-item>
       </a-form>
-    </a-modal>
-    
-    <!-- 模型管理弹窗 -->
-    <a-modal
+    </a-drawer>
+
+    <!-- 模型管理抽屉 -->
+    <a-drawer
       v-model:visible="showModelsModal"
       :title="currentProvider?.name + ' - 模型管理'"
-      width="950px"
+      :width="950"
       :footer="false"
+      unmount-on-close
     >
       <div style="margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; gap: 12px;">
         <a-input-search
@@ -338,15 +341,16 @@
           </a-table-column>
         </template>
       </a-table>
-    </a-modal>
-    
+    </a-drawer>
+
     <!-- 添加/编辑模型 -->
-    <a-modal
+    <a-drawer
       v-model:visible="showAddModel"
       :title="editingModel ? '编辑模型' : '添加模型'"
+      :width="650"
+      unmount-on-close
       @ok="handleModelSubmit"
       @cancel="resetModelForm"
-      width="650px"
     >
       <a-form :model="modelForm" layout="vertical">
         <a-row :gutter="16">
@@ -484,7 +488,7 @@
           </a-collapse-panel>
         </a-collapse>
       </a-form>
-    </a-modal>
+    </a-drawer>
   </div>
 </template>
 

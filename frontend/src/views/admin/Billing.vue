@@ -143,10 +143,12 @@
       </a-table>
     </a-card>
 
-    <!-- 编辑费率弹窗 -->
-    <a-modal 
-      v-model:visible="editModalVisible" 
-      title="编辑模型费率" 
+    <!-- 编辑费率抽屉 -->
+    <a-drawer
+      v-model:visible="editModalVisible"
+      title="编辑模型费率"
+      :width="480"
+      unmount-on-close
       @ok="saveRate"
       @cancel="editModalVisible = false"
     >
@@ -173,7 +175,7 @@
           />
         </a-form-item>
       </a-form>
-    </a-modal>
+    </a-drawer>
   </div>
 </template>
 

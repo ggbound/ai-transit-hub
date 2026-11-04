@@ -227,12 +227,13 @@
       </a-tab-pane>
     </a-tabs>
 
-    <!-- 操作日志详情弹窗 -->
-    <a-modal
+    <!-- 操作日志详情抽屉 -->
+    <a-drawer
       v-model:visible="detailVisible"
       title="操作日志详情"
       :footer="false"
-      width="640px"
+      :width="560"
+      unmount-on-close
     >
       <a-descriptions :column="2" size="medium" bordered v-if="detailRecord">
         <a-descriptions-item label="操作人" :span="1">{{ detailRecord.username || detailRecord.user?.name || '-' }}</a-descriptions-item>
@@ -264,10 +265,10 @@
         <div class="detail-json-title">响应结果</div>
         <pre class="detail-json">{{ prettyJSON(detailRecord.response_result) }}</pre>
       </div>
-    </a-modal>
+    </a-drawer>
 
-    <!-- 使用日志详情弹窗 -->
-    <a-modal v-model:visible="usageDetailVisible" title="使用日志详情" :footer="false" width="640px">
+    <!-- 使用日志详情抽屉 -->
+    <a-drawer v-model:visible="usageDetailVisible" title="使用日志详情" :footer="false" :width="560" unmount-on-close>
       <a-descriptions :column="2" size="medium" bordered v-if="usageDetail">
         <a-descriptions-item label="用户" :span="1">{{ usageDetail.user?.name || '-' }}</a-descriptions-item>
         <a-descriptions-item label="邮箱" :span="1">{{ usageDetail.user?.email || '-' }}</a-descriptions-item>
@@ -297,7 +298,7 @@
           <span class="error-detail-block">{{ usageDetail.error_message }}</span>
         </a-descriptions-item>
       </a-descriptions>
-    </a-modal>
+    </a-drawer>
   </div>
 </template>
 

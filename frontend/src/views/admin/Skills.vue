@@ -89,11 +89,12 @@
       </a-table>
     </a-card>
 
-    <!-- 新建 Skill 弹窗 -->
-    <a-modal
+    <!-- 新建 Skill 抽屉 -->
+    <a-drawer
       v-model:visible="showCreateModal"
       title="新建 Skill"
       :width="720"
+      unmount-on-close
       :ok-loading="createLoading"
       @before-ok="createSkill"
     >
@@ -148,13 +149,14 @@
           </a-upload>
         </a-tab-pane>
       </a-tabs>
-    </a-modal>
+    </a-drawer>
 
-    <!-- 编辑 Skill 弹窗 -->
-    <a-modal
+    <!-- 编辑 Skill 抽屉 -->
+    <a-drawer
       v-model:visible="showEditModalVisible"
       title="编辑 Skill"
       :width="720"
+      unmount-on-close
       :ok-loading="updateLoading"
       @before-ok="updateSkill"
     >
@@ -184,7 +186,7 @@
           <a-switch v-model="editForm.enabled" />
         </a-form-item>
       </a-form>
-    </a-modal>
+    </a-drawer>
 
     <!-- Skill 详情抽屉 -->
     <a-drawer

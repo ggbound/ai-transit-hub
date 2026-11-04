@@ -407,23 +407,26 @@
                   <span class="external-id">{{ record.external_task_id || '-' }}</span>
                 </template>
               </a-table-column>
-              <a-table-column title="操作" :width="100" fixed="right">
+              <a-table-column title="操作" :width="70" align="center" fixed="right">
                 <template #cell="{ record }">
-                  <a-button type="text" size="small" @click="showDetail(record)">
-                    详情
-                  </a-button>
+                  <a-tooltip content="查看详情">
+                    <a-button type="text" size="small" @click="showDetail(record)">
+                      <template #icon><icon-eye /></template>
+                    </a-button>
+                  </a-tooltip>
                 </template>
               </a-table-column>
             </template>
           </a-table>
         </a-card>
 
-        <!-- 详情弹窗 -->
-        <a-modal
+        <!-- 详情抽屉 -->
+        <a-drawer
           v-model:visible="detailModalVisible"
           title="请求详情"
-          width="80%"
-          :footer="null"
+          :width="860"
+          unmount-on-close
+          :footer="false"
         >
           <a-spin v-if="loadingDetail">
             <div style="height: 200px; text-align: center; line-height: 200px;">
@@ -463,7 +466,7 @@
               </div>
             </div>
           </template>
-        </a-modal>
+        </a-drawer>
       </a-col>
     </a-row>
   </div>

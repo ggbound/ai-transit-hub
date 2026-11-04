@@ -49,9 +49,13 @@
               <a-tag color="green" size="small">可用</a-tag>
             </template>
           </a-table-column>
-          <a-table-column title="操作" :width="100" fixed="right">
+          <a-table-column title="操作" :width="70" align="center" fixed="right">
             <template #cell="{ record }">
-              <a-button size="small" type="text" @click="showDetail(record)">查看</a-button>
+              <a-tooltip content="查看详情">
+                <a-button size="small" type="text" @click="showDetail(record)">
+                  <template #icon><icon-eye /></template>
+                </a-button>
+              </a-tooltip>
             </template>
           </a-table-column>
         </template>
@@ -116,6 +120,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import api from '../../utils/api'
+import { IconEye } from '@arco-design/web-vue/es/icon'
 import { marked } from 'marked'
 
 const skills = ref([])

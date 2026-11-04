@@ -230,13 +230,14 @@
       </div>
     </main>
 
-    <!-- 重命名弹窗 -->
-    <a-modal
+    <!-- 重命名抽屉 -->
+    <a-drawer
       v-model:visible="renameModalVisible"
       title="重命名对话"
+      :width="420"
+      unmount-on-close
       @ok="confirmRename"
       @cancel="renameModalVisible = false"
-      width="400px"
     >
       <a-input
         v-model="renameForm.title"
@@ -244,7 +245,7 @@
         size="large"
         allow-clear
       />
-    </a-modal>
+    </a-drawer>
   </div>
 </template>
 

@@ -449,21 +449,25 @@
                   <span class="external-id">{{ record.external_task_id || '-' }}</span>
                 </template>
               </a-table-column>
-              <a-table-column title="操作" :width="200" fixed="right">
+              <a-table-column title="操作" :width="110" align="center" fixed="right">
                 <template #cell="{ record }">
-                  <a-space>
-                    <a-button
-                      type="text"
-                      size="small"
-                      @click="queryVideoTask(record)"
-                      :loading="queryingTask && currentQueryingRecord?.id === record.id"
-                    >
-                      查询任务
-                    </a-button>
-                    <a-button type="text" size="small" @click="showDetail(record)">
-                      详情
-                    </a-button>
-                  </a-space>
+                  <a-button-group size="small">
+                    <a-tooltip content="查询任务">
+                      <a-button
+                        type="text"
+                        size="small"
+                        @click="queryVideoTask(record)"
+                        :loading="queryingTask && currentQueryingRecord?.id === record.id"
+                      >
+                        <template #icon><icon-refresh /></template>
+                      </a-button>
+                    </a-tooltip>
+                    <a-tooltip content="查看详情">
+                      <a-button type="text" size="small" @click="showDetail(record)">
+                        <template #icon><icon-eye /></template>
+                      </a-button>
+                    </a-tooltip>
+                  </a-button-group>
                 </template>
               </a-table-column>
             </template>
@@ -472,11 +476,12 @@
       </a-col>
     </a-row>
 
-    <a-modal
+    <a-drawer
       v-model:visible="detailModalVisible"
       title="请求详情"
-      width="80%"
-      :footer="null"
+      :width="860"
+      unmount-on-close
+      :footer="false"
     >
       <a-spin v-if="loadingDetail">
         <div style="height: 200px; text-align: center; line-height: 200px;">
@@ -515,7 +520,7 @@
           </div>
         </div>
       </template>
-    </a-modal>
+    </a-drawer>
   </div>
 </template>
 

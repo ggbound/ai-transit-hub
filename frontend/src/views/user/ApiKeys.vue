@@ -5,10 +5,11 @@
         <h1>API 密钥</h1>
         <p>管理您的 API 密钥以访问 API 接口</p>
       </div>
-      <a-button type="primary" @click="showCreateModal = true" class="create-btn">
-        <template #icon><icon-plus /></template>
-        新建密钥
-      </a-button>
+      <a-tooltip content="新建密钥">
+        <a-button type="primary" @click="showCreateModal = true" class="create-btn">
+          <template #icon><icon-plus /></template>
+        </a-button>
+      </a-tooltip>
     </div>
 
     <a-card class="table-card">
@@ -27,9 +28,11 @@
                 <a-tag color="blue" class="key-tag">
                   {{ maskApiKey(record.api_key) }}
                 </a-tag>
-                <a-button type="text" size="small" @click="copyApiKey(record.api_key)">
-                  <template #icon><icon-copy /></template>
-                </a-button>
+                <a-tooltip content="复制密钥">
+                  <a-button type="text" size="small" @click="copyApiKey(record.api_key)">
+                    <template #icon><icon-copy /></template>
+                  </a-button>
+                </a-tooltip>
               </a-space>
             </template>
           </a-table-column>
@@ -61,21 +64,26 @@
               />
             </template>
           </a-table-column>
-          <a-table-column title="操作" :width="100" fixed="right">
+          <a-table-column title="操作" :width="70" align="center" fixed="right">
             <template #cell="{ record }">
-              <a-button size="small" @click="showEditModal(record)">编辑</a-button>
+              <a-tooltip content="编辑">
+                <a-button type="text" size="small" @click="showEditModal(record)">
+                  <template #icon><icon-edit /></template>
+                </a-button>
+              </a-tooltip>
             </template>
           </a-table-column>
         </template>
       </a-table>
     </a-card>
 
-    <a-modal
+    <a-drawer
       v-model:visible="showCreateModal"
       title="创建 API 密钥"
+      :width="480"
+      unmount-on-close
       @ok="createKey"
-      :confirmLoading="createLoading"
-      :footer="true"
+      :ok-loading="createLoading"
     >
       <a-form :model="createForm" layout="vertical">
         <a-form-item label="密钥名称" field="key_name" :rules="[{required:true}]">
@@ -90,13 +98,15 @@
           />
         </a-form-item>
       </a-form>
-    </a-modal>
+    </a-drawer>
 
-    <a-modal
+    <a-drawer
       v-model:visible="showEditModalVisible"
       title="编辑 API 密钥"
+      :width="480"
+      unmount-on-close
       @ok="updateKey"
-      :confirmLoading="updateLoading"
+      :ok-loading="updateLoading"
     >
       <a-form :model="editForm" layout="vertical">
         <a-form-item label="密钥名称" field="key_name">
@@ -112,13 +122,13 @@
           />
         </a-form-item>
       </a-form>
-    </a-modal>
+    </a-drawer>
 
-    <a-modal
+    <a-drawer
       v-model:visible="showNewKeyModal"
       title="API 密钥已创建"
-      @ok="showNewKeyModal = false"
-      :cancel-button="null"
+      :width="480"
+      :footer="false"
     >
       <a-alert type="warning" :style="{ marginBottom: '20px' }">
         <div class="alert-content">
@@ -133,7 +143,7 @@
           复制
         </a-button>
       </a-input-group>
-    </a-modal>
+    </a-drawer>
   </div>
 </template>
 
@@ -141,7 +151,7 @@
 import { ref, onMounted } from 'vue'
 import api from '../../utils/api'
 import { Message } from '@arco-design/web-vue'
-import { IconPlus, IconCopy, IconInfoCircle } from '@arco-design/web-vue/es/icon'
+import { IconPlus, IconCopy, IconInfoCircle, IconEdit } from '@arco-design/web-vue/es/icon'
 
 const apiKeys = ref([])
 const loading = ref(false)

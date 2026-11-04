@@ -165,13 +165,15 @@
       </a-col>
     </a-row>
 
-    <!-- 修改密码弹窗 -->
-    <a-modal
+    <!-- 修改密码抽屉 -->
+    <a-drawer
       v-model:visible="showPasswordModal"
       title="修改密码"
+      :width="440"
+      unmount-on-close
       @ok="changePassword"
       @cancel="resetPasswordForm"
-      :confirm-loading="passwordLoading"
+      :ok-loading="passwordLoading"
     >
       <a-form :model="passwordForm" layout="vertical">
         <a-form-item label="旧密码" required>
@@ -196,7 +198,7 @@
           />
         </a-form-item>
       </a-form>
-    </a-modal>
+    </a-drawer>
   </div>
 </template>
 

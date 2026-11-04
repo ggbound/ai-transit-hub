@@ -104,11 +104,13 @@
                   <a-tag v-else color="gray">未知</a-tag>
                 </template>
               </a-table-column>
-              <a-table-column title="详情" width="110" align="center" fixed="right">
+              <a-table-column title="详情" width="70" align="center" fixed="right">
                 <template #cell="{ record }">
-                  <a-button type="outline" size="small" @click="showUsageDetail(record)">
-                    查看详情
-                  </a-button>
+                  <a-tooltip content="查看详情">
+                    <a-button type="text" size="small" @click="showUsageDetail(record)">
+                      <template #icon><icon-eye /></template>
+                    </a-button>
+                  </a-tooltip>
                 </template>
               </a-table-column>
             </template>
@@ -216,9 +218,13 @@
                   </a-tag>
                 </template>
               </a-table-column>
-              <a-table-column title="操作" width="90" fixed="right">
+              <a-table-column title="操作" width="70" align="center" fixed="right">
                 <template #cell="{ record }">
-                  <a-button size="small" type="text" @click="showDetail(record)">详情</a-button>
+                  <a-tooltip content="详情">
+                    <a-button type="text" size="small" @click="showDetail(record)">
+                      <template #icon><icon-eye /></template>
+                    </a-button>
+                  </a-tooltip>
                 </template>
               </a-table-column>
             </template>
@@ -305,6 +311,7 @@
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
 import { Message } from '@arco-design/web-vue'
+import { IconEye } from '@arco-design/web-vue/es/icon'
 import api from '../../utils/api'
 
 const activeTab = ref('usage')

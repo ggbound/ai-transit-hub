@@ -16,10 +16,11 @@
         />
       </a-col>
       <a-col :xs="24" :sm="12" :md="16" :lg="18" style="text-align: right;">
-        <a-button type="primary" @click="showAddModal = true">
-          <template #icon><icon-plus /></template>
-          添加提供商
-        </a-button>
+        <a-tooltip content="添加提供商">
+          <a-button type="primary" @click="showAddModal = true">
+            <template #icon><icon-plus /></template>
+          </a-button>
+        </a-tooltip>
       </a-col>
     </a-row>
     
@@ -77,13 +78,30 @@
             </template>
           </a-table-column>
           
-          <a-table-column title="操作" width="230" fixed="right">
+          <a-table-column title="操作" width="160" align="center" fixed="right">
             <template #cell="{ record }">
-              <a-space>
-                <a-button size="small" @click="editProvider(record)">编辑</a-button>
-                <a-button size="small" @click="manageModels(record)">模型</a-button>
-                <a-button size="small" @click="manageKeys(record)">密钥</a-button>
-              </a-space>
+              <a-button-group size="small">
+                <a-tooltip content="编辑">
+                  <a-button type="text" size="small" @click="editProvider(record)">
+                    <template #icon><icon-edit /></template>
+                  </a-button>
+                </a-tooltip>
+                <a-tooltip content="模型">
+                  <a-button type="text" size="small" @click="manageModels(record)">
+                    <template #icon><icon-apps /></template>
+                  </a-button>
+                </a-tooltip>
+                <a-tooltip content="密钥">
+                  <a-button type="text" size="small" @click="manageKeys(record)">
+                    <template #icon><icon-lock /></template>
+                  </a-button>
+                </a-tooltip>
+                <a-tooltip v-if="record.doc_url" content="文档">
+                  <a-button type="text" size="small" @click="openDoc(record.doc_url)">
+                    <template #icon><icon-link /></template>
+                  </a-button>
+                </a-tooltip>
+              </a-button-group>
             </template>
           </a-table-column>
         </template>
@@ -119,15 +137,18 @@
           </a-col>
         </a-row>
         
-        <a-form-item 
-          label="API地址" 
+        <a-form-item
+          label="API地址"
           required
-          extra="支持两种模式：1) 基础地址 https://api.example.com/v1  2) 完整地址 https://api.example.com/v3/chat/completions&lt;br/&gt;【火山引擎提示】推荐填：https://ark.cn-beijing.volces.com/api/v3"
         >
-          <a-input 
-            v-model="form.base_url" 
-            placeholder="https://ark.cn-beijing.volces.com/api/v3" 
+          <a-input
+            v-model="form.base_url"
+            placeholder="https://ark.cn-beijing.volces.com/api/v3"
           />
+          <template #extra>
+            <div>支持两种模式：1) 基础地址 https://api.example.com/v1　2) 完整地址 https://api.example.com/v3/chat/completions</div>
+            <div>【火山引擎提示】推荐填：https://ark.cn-beijing.volces.com/api/v3</div>
+          </template>
         </a-form-item>
         
         <a-form-item label="认证类型" required>
@@ -185,10 +206,11 @@
       unmount-on-close
     >
       <div style="margin-bottom: 16px; text-align: right;">
-        <a-button type="primary" @click="showAddKey = true">
-          <template #icon><icon-plus /></template>
-          添加密钥
-        </a-button>
+        <a-tooltip content="添加密钥">
+          <a-button type="primary" @click="showAddKey = true">
+            <template #icon><icon-plus /></template>
+          </a-button>
+        </a-tooltip>
       </div>
       
       <a-table :data="providerKeys" :loading="keysLoading" :pagination="{ pageSize: 5 }" :scroll="{ x: 1200 }">
@@ -206,9 +228,13 @@
               />
             </template>
           </a-table-column>
-          <a-table-column title="操作" width="80" align="center" fixed="right">
+          <a-table-column title="操作" width="70" align="center" fixed="right">
             <template #cell="{ record }">
-              <a-button type="text" size="small" @click="editKey(record)">编辑</a-button>
+              <a-tooltip content="编辑">
+                <a-button type="text" size="small" @click="editKey(record)">
+                  <template #icon><icon-edit /></template>
+                </a-button>
+              </a-tooltip>
             </template>
           </a-table-column>
         </template>
@@ -231,9 +257,8 @@
         <a-form-item label="API Key" required>
           <a-input-password v-model="keyForm.api_key" placeholder="输入API密钥" />
         </a-form-item>
-        <a-form-item label="权重">
+        <a-form-item label="权重" extra="权重越高，被调用的概率越大">
           <a-input-number v-model="keyForm.weight" :min="1" :default-value="1" />
-          <div style="color: var(--color-text-3); font-size: 12px; margin-top: 4px;">权重越高，被调用的概率越大</div>
         </a-form-item>
         <a-form-item label="启用状态">
           <a-switch v-model="keyForm.status" />
@@ -259,10 +284,11 @@
           @press-enter="handleModelSearch"
           @clear="handleModelSearch"
         />
-        <a-button type="primary" @click="showAddModel = true">
-          <template #icon><icon-plus /></template>
-          添加模型
-        </a-button>
+        <a-tooltip content="添加模型">
+          <a-button type="primary" @click="showAddModel = true">
+            <template #icon><icon-plus /></template>
+          </a-button>
+        </a-tooltip>
       </div>
       
       <a-table
@@ -334,9 +360,13 @@
               <a-tag :color="record.supports_messages ? 'purple' : 'default'">{{ record.supports_messages ? '已启用' : '未启用' }}</a-tag>
             </template>
           </a-table-column>
-          <a-table-column title="操作" width="90" align="center" fixed="right">
+          <a-table-column title="操作" width="70" align="center" fixed="right">
             <template #cell="{ record }">
-              <a-button type="text" size="small" @click="editModel(record)">编辑</a-button>
+              <a-tooltip content="编辑">
+                <a-button type="text" size="small" @click="editModel(record)">
+                  <template #icon><icon-edit /></template>
+                </a-button>
+              </a-tooltip>
             </template>
           </a-table-column>
         </template>
@@ -482,7 +512,7 @@
   }
 }'
             />
-            <div style="color: #999; font-size: 12px; margin-top: 4px;">
+            <div style="color: var(--color-text-3); font-size: 12px; margin-top: 4px;">
               完整配置可以覆盖提供商的所有设置（base_url、request_format、response_format 等），通常不需要
             </div>
           </a-collapse-panel>
@@ -496,7 +526,7 @@
 import { ref, onMounted } from 'vue'
 import { Message } from '@arco-design/web-vue'
 import api from '../../utils/api'
-import { IconPlus, IconApps, IconLock, IconLink } from '@arco-design/web-vue/es/icon'
+import { IconPlus, IconApps, IconLock, IconLink, IconEdit } from '@arco-design/web-vue/es/icon'
 
 const providers = ref([])
 

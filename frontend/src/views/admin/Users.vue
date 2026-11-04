@@ -16,10 +16,11 @@
         />
       </a-col>
       <a-col :xs="24" :sm="12" :md="16" :lg="18" style="text-align: right;">
-        <a-button type="primary" @click="showCreateModal = true">
-          <template #icon><icon-plus /></template>
-          新建用户
-        </a-button>
+        <a-tooltip content="新建用户">
+          <a-button type="primary" @click="showCreateModal = true">
+            <template #icon><icon-plus /></template>
+          </a-button>
+        </a-tooltip>
       </a-col>
     </a-row>
     
@@ -58,9 +59,13 @@
               {{ formatDate(record.created_at) }}
             </template>
           </a-table-column>
-          <a-table-column title="操作" width="80" fixed="right">
+          <a-table-column title="操作" width="70" align="center" fixed="right">
             <template #cell="{ record }">
-              <a-button size="small" @click="showEditModal(record)">编辑</a-button>
+              <a-tooltip content="编辑">
+                <a-button type="text" size="small" @click="showEditModal(record)">
+                  <template #icon><icon-edit /></template>
+                </a-button>
+              </a-tooltip>
             </template>
           </a-table-column>
         </template>
@@ -147,7 +152,7 @@
 import { ref, onMounted } from 'vue'
 import api from '../../utils/api'
 import { Message } from '@arco-design/web-vue'
-import { IconPlus } from '@arco-design/web-vue/es/icon'
+import { IconPlus, IconEdit } from '@arco-design/web-vue/es/icon'
 
 const users = ref([])
 const allRoles = ref([])

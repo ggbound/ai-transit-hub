@@ -30,10 +30,11 @@
         </a-space>
       </a-col>
       <a-col :xs="24" :sm="12" :md="16" :lg="14" style="text-align: right;">
-        <a-button type="primary" @click="openCreateModal">
-          <template #icon><icon-plus /></template>
-          新建 Skill
-        </a-button>
+        <a-tooltip content="新建 Skill">
+          <a-button type="primary" @click="openCreateModal">
+            <template #icon><icon-plus /></template>
+          </a-button>
+        </a-tooltip>
       </a-col>
     </a-row>
 
@@ -73,16 +74,32 @@
               {{ formatDate(record.created_at) }}
             </template>
           </a-table-column>
-          <a-table-column title="操作" width="260" fixed="right">
+          <a-table-column title="操作" width="170" align="center" fixed="right">
             <template #cell="{ record }">
-              <a-space size="mini">
-                <a-button size="mini" type="text" @click="showDetail(record)">查看</a-button>
-                <a-button size="mini" type="text" @click="showEditModal(record)">编辑</a-button>
-                <a-button size="mini" type="text" @click="downloadSkill(record)">下载</a-button>
+              <a-button-group size="small">
+                <a-tooltip content="查看">
+                  <a-button type="text" size="small" @click="showDetail(record)">
+                    <template #icon><icon-eye /></template>
+                  </a-button>
+                </a-tooltip>
+                <a-tooltip content="编辑">
+                  <a-button type="text" size="small" @click="showEditModal(record)">
+                    <template #icon><icon-edit /></template>
+                  </a-button>
+                </a-tooltip>
+                <a-tooltip content="下载">
+                  <a-button type="text" size="small" @click="downloadSkill(record)">
+                    <template #icon><icon-download /></template>
+                  </a-button>
+                </a-tooltip>
                 <a-popconfirm content="确定删除该 Skill 吗？附件将一并删除。" type="warning" @ok="deleteSkill(record.id)">
-                  <a-button size="mini" type="text" status="danger">删除</a-button>
+                  <a-tooltip content="删除">
+                    <a-button type="text" size="small" status="danger">
+                      <template #icon><icon-delete /></template>
+                    </a-button>
+                  </a-tooltip>
                 </a-popconfirm>
-              </a-space>
+              </a-button-group>
             </template>
           </a-table-column>
         </template>
@@ -254,7 +271,7 @@ import { ref, computed, onMounted } from 'vue'
 import api from '../../utils/api'
 import { Message } from '@arco-design/web-vue'
 import { marked } from 'marked'
-import { IconPlus, IconUpload, IconDownload } from '@arco-design/web-vue/es/icon'
+import { IconPlus, IconUpload, IconDownload, IconEye, IconEdit, IconDelete } from '@arco-design/web-vue/es/icon'
 
 const skills = ref([])
 const loading = ref(false)

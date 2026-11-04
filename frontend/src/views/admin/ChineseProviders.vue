@@ -9,10 +9,11 @@
     <a-row :gutter="16" style="margin-bottom: 16px;">
       <a-col :xs="24" :sm="24" :md="24" :lg="24" style="text-align: right;">
         <a-space>
-          <a-button type="primary" @click="showAddModal = true">
-            <icon-plus />
-            添加配置
-          </a-button>
+          <a-tooltip content="添加配置">
+            <a-button type="primary" @click="showAddModal = true">
+              <template #icon><icon-plus /></template>
+            </a-button>
+          </a-tooltip>
         </a-space>
       </a-col>
     </a-row>
@@ -135,11 +136,13 @@
             </template>
           </a-table-column>
           <a-table-column title="创建时间" data-index="created_at" />
-          <a-table-column title="操作" width="80">
+          <a-table-column title="操作" width="70" align="center">
             <template #cell="{ record }">
-              <a-button type="text" size="small" @click="editKey(record)">
-                <icon-edit />
-              </a-button>
+              <a-tooltip content="编辑">
+                <a-button type="text" size="small" @click="editKey(record)">
+                  <template #icon><icon-edit /></template>
+                </a-button>
+              </a-tooltip>
             </template>
           </a-table-column>
         </template>
@@ -190,11 +193,13 @@
         <template #columns>
           <a-table-column title="模型ID" data-index="id" />
           <a-table-column title="显示名称" data-index="display_name" />
-          <a-table-column title="操作">
+          <a-table-column title="操作" width="70" align="center">
             <template #cell="{ record }">
-              <a-button type="primary" size="small" @click="addModelToSystem(record)">
-                添加到系统
-              </a-button>
+              <a-tooltip content="添加到系统">
+                <a-button type="text" size="small" @click="addModelToSystem(record)">
+                  <template #icon><icon-plus /></template>
+                </a-button>
+              </a-tooltip>
             </template>
           </a-table-column>
         </template>

@@ -94,12 +94,13 @@
               <span class="price-text">¥{{ record.output_price.toFixed(4) }} <em>/ 百万tokens</em></span>
             </template>
           </a-table-column>
-          <a-table-column title="操作" fixed="right" :width="100" align="center">
+          <a-table-column title="操作" fixed="right" :width="70" align="center">
             <template #cell="{ record }">
-              <a-button type="text" size="small" @click="editRate(record)">
-                <template #icon><icon-edit /></template>
-                编辑
-              </a-button>
+              <a-tooltip content="编辑">
+                <a-button type="text" size="small" @click="editRate(record)">
+                  <template #icon><icon-edit /></template>
+                </a-button>
+              </a-tooltip>
             </template>
           </a-table-column>
         </template>

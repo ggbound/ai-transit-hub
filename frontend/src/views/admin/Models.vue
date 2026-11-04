@@ -16,10 +16,11 @@
         />
       </a-col>
       <a-col :xs="24" :sm="12" :md="16" :lg="18" style="text-align: right;">
-        <a-button type="primary" @click="showCreateModal = true">
-          <template #icon><icon-plus /></template>
-          新建模型
-        </a-button>
+        <a-tooltip content="新建模型">
+          <a-button type="primary" @click="showCreateModal = true">
+            <template #icon><icon-plus /></template>
+          </a-button>
+        </a-tooltip>
       </a-col>
     </a-row>
     
@@ -102,9 +103,13 @@
             </a-tag>
           </template>
         </a-table-column>
-        <a-table-column title="操作" width="90" fixed="right">
+        <a-table-column title="操作" width="70" align="center" fixed="right">
           <template #cell="{ record }">
-            <a-button size="small" @click="showEditModal(record)">编辑</a-button>
+            <a-tooltip content="编辑">
+              <a-button type="text" size="small" @click="showEditModal(record)">
+                <template #icon><icon-edit /></template>
+              </a-button>
+            </a-tooltip>
           </template>
         </a-table-column>
       </template>
@@ -195,54 +200,42 @@
           </a-col>
         </a-row>
         <a-divider orientation="left">快速配置（推荐）</a-divider>
-        <a-form-item label="自定义端点">
-          <a-input 
+        <a-form-item label="自定义端点" extra="填该模型对应的接口路径，完整地址 = 提供商 base_url + 该路径">
+          <a-input
             v-model="createForm.custom_endpoint"
             placeholder="/api/v3/chat/completions"
           />
-          <div style="color: #999; font-size: 12px; margin-top: 4px;">
-            填该模型对应的接口路径，完整地址 = 提供商 base_url + 该路径
-          </div>
         </a-form-item>
-        
+
         <template v-if="createForm.type === 'video'">
           <a-divider orientation="left">视频任务查询配置</a-divider>
-          <a-form-item label="视频任务查询端点">
-            <a-input 
+          <a-form-item label="视频任务查询端点" extra="用于查询视频生成任务状态的端点，完整地址 = 提供商 base_url + 该路径">
+            <a-input
               v-model="createForm.video_endpoint"
               placeholder="/contents/generations/tasks"
             />
-            <div style="color: #999; font-size: 12px; margin-top: 4px;">
-              用于查询视频生成任务状态的端点，完整地址 = 提供商 base_url + 该路径
-            </div>
           </a-form-item>
         </template>
-        
+
         <a-divider orientation="left">Responses API 配置</a-divider>
         <a-form-item label="支持 Responses API">
           <a-switch v-model="createForm.supports_response" />
         </a-form-item>
-        <a-form-item label="Responses API 端点" v-if="createForm.supports_response">
-          <a-input 
+        <a-form-item label="Responses API 端点" v-if="createForm.supports_response" extra="填该模型对应的 Responses API 端点（完整地址）">
+          <a-input
             v-model="createForm.response_endpoint"
             placeholder="https://ark.cn-beijing.volces.com/api/v3/responses"
           />
-          <div style="color: #999; font-size: 12px; margin-top: 4px;">
-            填该模型对应的 Responses API 端点（完整地址）
-          </div>
         </a-form-item>
         <a-divider orientation="left">Anthropic Messages API 配置</a-divider>
         <a-form-item label="支持 Messages API">
           <a-switch v-model="createForm.supports_messages" />
         </a-form-item>
-        <a-form-item label="Messages API 端点" v-if="createForm.supports_messages">
+        <a-form-item label="Messages API 端点" v-if="createForm.supports_messages" extra="填该模型对应的 Messages API 端点（完整地址）">
           <a-input
             v-model="createForm.messages_endpoint"
             placeholder="https://api.anthropic.com/v1/messages"
           />
-          <div style="color: #999; font-size: 12px; margin-top: 4px;">
-            填该模型对应的 Messages API 端点（完整地址）
-          </div>
         </a-form-item>
       </a-form>
     </a-drawer>
@@ -331,60 +324,48 @@
           </a-col>
         </a-row>
         <a-divider orientation="left">快速配置（推荐）</a-divider>
-        <a-form-item label="自定义端点">
-          <a-input 
+        <a-form-item label="自定义端点" extra="填该模型对应的接口路径，完整地址 = 提供商 base_url + 该路径，留空则使用提供商默认配置">
+          <a-input
             v-model="editForm.custom_endpoint"
             placeholder="/api/v3/chat/completions"
           />
-          <div style="color: #999; font-size: 12px; margin-top: 4px;">
-            填该模型对应的接口路径，完整地址 = 提供商 base_url + 该路径，留空则使用提供商默认配置
-          </div>
         </a-form-item>
-        
+
         <template v-if="editForm.type === 'video'">
           <a-divider orientation="left">视频任务查询配置</a-divider>
-          <a-form-item label="视频任务查询端点">
-            <a-input 
+          <a-form-item label="视频任务查询端点" extra="用于查询视频生成任务状态的端点，完整地址 = 提供商 base_url + 该路径">
+            <a-input
               v-model="editForm.video_endpoint"
               placeholder="/contents/generations/tasks"
             />
-            <div style="color: #999; font-size: 12px; margin-top: 4px;">
-              用于查询视频生成任务状态的端点，完整地址 = 提供商 base_url + 该路径
-            </div>
           </a-form-item>
         </template>
-        
+
         <a-divider orientation="left">Responses API 配置</a-divider>
         <a-form-item label="支持 Responses API">
           <a-switch v-model="editForm.supports_response" />
         </a-form-item>
-        <a-form-item label="Responses API 端点" v-if="editForm.supports_response">
-          <a-input 
+        <a-form-item label="Responses API 端点" v-if="editForm.supports_response" extra="填该模型对应的 Responses API 端点（完整地址）">
+          <a-input
             v-model="editForm.response_endpoint"
             placeholder="https://ark.cn-beijing.volces.com/api/v3/responses"
           />
-          <div style="color: #999; font-size: 12px; margin-top: 4px;">
-            填该模型对应的 Responses API 端点（完整地址）
-          </div>
         </a-form-item>
         <a-divider orientation="left">Anthropic Messages API 配置</a-divider>
         <a-form-item label="支持 Messages API">
           <a-switch v-model="editForm.supports_messages" />
         </a-form-item>
-        <a-form-item label="Messages API 端点" v-if="editForm.supports_messages">
-          <a-input 
+        <a-form-item label="Messages API 端点" v-if="editForm.supports_messages" extra="填该模型对应的 Messages API 端点（完整地址）">
+          <a-input
             v-model="editForm.messages_endpoint"
             placeholder="https://api.anthropic.com/v1/messages"
           />
-          <div style="color: #999; font-size: 12px; margin-top: 4px;">
-            填该模型对应的 Messages API 端点（完整地址）
-          </div>
         </a-form-item>
-        
+
         <a-divider orientation="left">高级配置（不推荐）</a-divider>
         <a-collapse v-model="advancedConfigOpen">
           <a-collapse-panel key="1" header="完整配置（JSON）">
-            <a-textarea 
+            <a-textarea
               v-model="editForm.configJson"
               :rows="8"
               placeholder='{
@@ -394,7 +375,7 @@
   }
 }'
             />
-            <div style="color: #999; font-size: 12px; margin-top: 4px;">
+            <div style="color: var(--color-text-3); font-size: 12px; margin-top: 4px;">
               完整配置可以覆盖提供商的所有设置（base_url、request_format、response_format 等），通常不需要
             </div>
           </a-collapse-panel>
@@ -408,7 +389,7 @@
 import { ref, computed, onMounted, watch } from 'vue'
 import api from '../../utils/api'
 import { Message } from '@arco-design/web-vue'
-import { IconPlus } from '@arco-design/web-vue/es/icon'
+import { IconPlus, IconEdit } from '@arco-design/web-vue/es/icon'
 
 const models = ref([])
 const providers = ref([])
